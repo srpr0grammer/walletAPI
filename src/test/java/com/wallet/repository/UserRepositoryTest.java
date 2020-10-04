@@ -34,6 +34,8 @@ public class UserRepositoryTest {
 		u.setName("Set up USer");
 		u.setPassword("Senha123");
 		u.setEmail(EMAIL);
+		
+		repository.save(u);
 	}
 	
 	@AfterEach // essa anotacao indica que esse metodo sera excecutado depois que todos os metodos for executados.
