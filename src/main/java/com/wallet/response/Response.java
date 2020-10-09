@@ -1,5 +1,6 @@
 package com.wallet.response;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Getter;
@@ -20,5 +21,14 @@ public class Response <T> {
 	
 	// O atributo errors ira tratar erros.
 	private List<String> errors;
+	
+	// INiciando um array vazio.
+	public List<String> getErros(){
+		if (this.errors == null) {
+			this.errors = new ArrayList<String>();
+		}
+		
+		return errors;
+	}
 	
 }
