@@ -2,6 +2,9 @@ package com.wallet.dto;
 
 import javax.validation.constraints.NotNull;
 
+import lombok.Data;
+
+@Data
 public class UserWalletDTO {
 
 	

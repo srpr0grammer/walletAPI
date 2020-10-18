@@ -3,6 +3,8 @@ package com.wallet.response;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.wallet.dto.UserWalletDTO;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
