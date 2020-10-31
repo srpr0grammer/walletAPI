@@ -15,7 +15,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import com.wallet.Entity.User;
+import com.wallet.entity.User;
 import com.wallet.repository.UserRepository;
 
 @ExtendWith(SpringExtension.class)

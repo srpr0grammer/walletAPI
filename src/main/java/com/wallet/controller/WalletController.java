@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.wallet.Entity.Wallet;
 import com.wallet.dto.WalletDTO;
+import com.wallet.entity.Wallet;
 import com.wallet.response.Response;
 import com.wallet.service.WalletService;
 

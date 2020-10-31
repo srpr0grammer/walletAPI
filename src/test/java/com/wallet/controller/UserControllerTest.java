@@ -19,8 +19,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.wallet.Entity.User;
 import com.wallet.dto.UserDTO;
+import com.wallet.entity.User;
 import com.wallet.service.UserService;
 
 @ExtendWith(SpringExtension.class)

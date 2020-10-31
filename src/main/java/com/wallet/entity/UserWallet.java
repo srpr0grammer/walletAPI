@@ -1,4 +1,4 @@
-package com.wallet.Entity;
+package com.wallet.entity;
 
 import java.io.Serializable;
 

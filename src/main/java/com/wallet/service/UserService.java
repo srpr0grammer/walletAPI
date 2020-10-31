@@ -2,7 +2,7 @@ package com.wallet.service;
 
 import java.util.Optional;
 
-import com.wallet.Entity.User;
+import com.wallet.entity.User;
 
 public interface UserService {
 	
