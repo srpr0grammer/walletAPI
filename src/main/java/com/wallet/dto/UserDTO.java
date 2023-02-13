@@ -1,28 +1,25 @@
 package com.wallet.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import javax.persistence.Column;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 
-import org.hibernate.validator.constraints.Length;
-
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-
-import lombok.Data;
-
 @Data
-@JsonInclude(value = Include.NON_NULL)
+@AllArgsConstructor
+@NoArgsConstructor
 public class UserDTO {
 
-	private Long id;
-	
-	@Email(message = "Email inválido.")
-	private String email;
-	
-	@Length(message = "O nome deve conter entre 3 e 50 caracteres.")
-	private String name;
-	
-	@NotNull()
-	@Length(min = 6, message = " A senha deve conter no minimo 6 caractere.")
-	private String password;
+    @NotNull(message = "Riquired field.")
+    private String name;
+
+    @NotNull(message = "Riquired field.")
+    private String password;
+
+    @NotNull(message = "Riquired field.")
+    @Email(message = "Enter the email in the correct format.")
+    private String email;
 }

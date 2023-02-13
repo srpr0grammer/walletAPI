@@ -2,13 +2,13 @@ package com.wallet.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wallet.dto.UserDTO;
+import com.wallet.dto.WalletDTO;
 import com.wallet.entity.User;
-import com.wallet.response.UserResponse;
+import com.wallet.entity.Wallet;
 import com.wallet.service.UserService;
-import com.wallet.util.enums.RoleEnum;
+import com.wallet.service.WalletService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +19,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.math.BigDecimal;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -28,11 +30,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @SpringBootTest
 @AutoConfigureMockMvc
-public class UserControllerTest {
-	private static final String URL = "/user";
+public class WalletControllerTest {
+	private static final String URL = "/wallet";
 
 	@Mock
-    private UserService userService;
+    private WalletService walletService;
 
     @Mock
     private ModelMapper modelMapper;
@@ -42,22 +44,22 @@ public class UserControllerTest {
 
 	@Test
 	public void saveSuccess() throws Exception {
-        var userDTO = getMockUserDTO();
-        var user = modelMapper.map(userDTO, User.class);
+        var walletDTO = getMockWalletDTO();
+        var wallet = modelMapper.map(walletDTO, Wallet.class);
 
-        when(userService.create(any(User.class))).thenReturn(user);
+        when(walletService.save(any(Wallet.class))).thenReturn(wallet);
         mockMvc.perform(post(URL)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(asJsonString(userDTO)))
+                        .content(asJsonString(walletDTO)))
                 .andExpect(status().isCreated());
 
 	}
 
-    private UserDTO getMockUserDTO() {
-        var dto = new UserDTO();
+    private WalletDTO getMockWalletDTO() {
+        var dto = new WalletDTO();
+        dto.setId(1L);
         dto.setName("TESTE");
-        dto.setPassword("TESTESTE");
-        dto.setEmail("TESTE@hotmail.com");
+        dto.setValue(new BigDecimal("20.1"));
 
         return dto;
     }

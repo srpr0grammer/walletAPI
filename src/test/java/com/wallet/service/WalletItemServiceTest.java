@@ -1,103 +1,151 @@
 package com.wallet.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertIterableEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
+import com.wallet.entity.Wallet;
+import com.wallet.entity.WalletItem;
+import com.wallet.repository.WalletItemRepository;
+import com.wallet.service.exception.BusinessException;
+import com.wallet.util.enums.TypeEnum;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.BDDMockito;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import com.wallet.entity.Wallet;
-import com.wallet.entity.WalletItem;
-import com.wallet.repository.WalletItemRepository;
-import com.wallet.util.enums.TypeEnum;
+import java.math.BigDecimal;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @ActiveProfiles("test")
 public class WalletItemServiceTest {
 
-	@Autowired
-	WalletItemRepository repository;
+	@Mock
+	private WalletItemRepository repository;
 
-	@Autowired
-	WalletItemService service;
+	@InjectMocks
+	private WalletItemService service;
 
-	private static final Date DATE = new Date();
-	private static final TypeEnum TYPE = TypeEnum.EN;
-	private static final String DESCRIPTION = "Conta de Luz";
-	private static final BigDecimal VALUE = BigDecimal.valueOf(65);
+    @Test
+	public void saveSuccess() {
+		var walletItem = getMockWalletItem();
 
-	public void testSave() {
-		BDDMockito.given(repository.save(Mockito.any(WalletItem.class))).willReturn(getMockWalletItem());
+        when(repository.save(any(WalletItem.class))).thenReturn(walletItem);
+       	service.save(walletItem);
 
-		WalletItem response = service.save(new WalletItem());
-
-		assertNotNull(response);
-		assertEquals(response.getDescription(), DESCRIPTION);
-		assertEquals(response.getValue().compareTo(VALUE), 0);
+        verify(repository).save(walletItem);
 	}
-	
 
-	public void testFindBetweenDates() {
-		List<WalletItem> list = new ArrayList<>();
-		list.add(getMockWalletItem());
-		Page<WalletItem> page = new PageImpl<>(list);
-		
-		BDDMockito.given(repository.findAllByWalletIdAndDateGreaterThanEqualAndDateLessThanEqual(Mockito.anyLong(), Mockito.any(Date.class), Mockito.any(Date.class), Mockito.any(PageRequest.class))).willReturn(page);	
-		
-		Page<WalletItem> response = service.findBetweenDates(1L, new Date(), new Date(), 0);
-		
-		assertNotNull(response);
-		assertEquals(response.getContent().size(), 1);
-		assertEquals(response.getContent().get(0).getDescription(), DESCRIPTION);
-	}
-	
 	@Test
-	public void testFindByType() {
-		List<WalletItem> list = new ArrayList<>();
-		list.add(getMockWalletItem());
-		
-		BDDMockito.given(repository.findByWalletIdAndType(Mockito.anyLong(), Mockito.any(TypeEnum.class))).willReturn(list);
-		
-		List<WalletItem> response = service.findByWalletAndType(1L, TypeEnum.EN);
-		
-		assertNotNull(response);
-		assertEquals(response.get(0).getType(), TYPE);
+	public void getByIdSuccess() {
+		var walletItem = getMockWalletItem();
+
+		when(repository.findById(1L)).thenReturn(Optional.of(walletItem));
+		var actualWalletItem = service.findById(1L);
+
+		assertEquals(walletItem, actualWalletItem);
 	}
-	
+
 	@Test
-	public void testSumByWallet() {
-		BigDecimal value = BigDecimal.valueOf(45);
-		
-		BDDMockito.given(repository.sumByWalletId(Mockito.anyLong())).willReturn(value);
-		
-		BigDecimal response = service.sumByWalletId(1L);
-		
-		assertEquals(response.compareTo(value), 0);
+	public void getByIdWithNonExistsId() {
+		when(repository.findById(1L)).thenReturn(Optional.empty());
+
+		assertThrows(BusinessException.class, () -> {
+			service.findById(1L);
+		});
+
 	}
-	
+
+	@Test
+	public void findBetweenDatesSuccess() {
+		var items = List.of(getMockWalletItem());
+
+		when(repository.findAllByWalletIdAndDateGreaterThanEqualAndDateLessThanEqual
+				(anyLong(), any(Date.class), any(Date.class), any(PageRequest.class))).thenReturn(new PageImpl<>(items));
+
+		var result = service
+				.findBetweenDates(1L, new Date(), new Date(), 1, 1);
+
+		assertNotNull(result);
+		assertEquals(1, result.getSize());
+
+	}
+
+	@Test
+	public void findByWalletAndTypeSuccess() {
+		var expectedItems = List.of(getMockWalletItem());
+
+		when(repository.findByWalletIdAndType(anyLong(), any(TypeEnum.class))).thenReturn(expectedItems);
+
+		var result =
+				service.findByWalletAndType(1L, TypeEnum.EN);
+
+		verify(repository).findByWalletIdAndType(1L, TypeEnum.EN);
+		assertEquals(expectedItems, result);
+
+	}
+
+	@Test
+	public void deleteSuccess() {
+		var expectedWalletItem = getMockWalletItem();
+
+		when(repository.findById(1L)).thenReturn(Optional.of(expectedWalletItem));
+		service.deleteById(expectedWalletItem.getId());
+
+		verify(repository).deleteById(expectedWalletItem.getId());
+	}
+
+	@Test
+	public void deleteWithInvalidId() {
+		Long id = null;
+		try {
+			service.deleteById(id);
+			fail("WalletItem not found.");
+		} catch (BusinessException e) {
+
+		}
+
+		verify( repository, never()).deleteById(id);
+	}
+
+	@Test
+	public void deleteWithNonExistsId() {
+
+		when(repository.findById(1L)).thenReturn(Optional.empty());
+
+		assertThrows(BusinessException.class, () -> {
+			service.findById(1L);
+		});
+	}
+
+    private Wallet getMockWallet() {
+        var wallet = new Wallet();
+        wallet.setId(1L);
+        wallet.setName("TESTE");
+        wallet.setValue(new BigDecimal("20.30"));
+
+        return wallet;
+    }
+
 	private WalletItem getMockWalletItem() {
-		Wallet w = new Wallet();
-		w.setId(1L);
-		
-		WalletItem wi = new WalletItem(1L, w, DATE, TYPE, DESCRIPTION, VALUE);		
-		return wi;
-	}
+		var walletItem = new WalletItem();
+		var date = new Date();
 
+		walletItem.setId(1L);
+        walletItem.setValue(new BigDecimal("20.30"));
+        walletItem.setWallet(getMockWallet());
+        walletItem.setDate(date);
+		walletItem.setType(TypeEnum.EN);
+
+		return walletItem;
+	}
 
 }
